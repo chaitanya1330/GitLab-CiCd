@@ -1,0 +1,23 @@
+stages:
+    - build_stage
+    - deploy_stage
+
+build:
+    stage: build_stage
+    script:
+        - docker --version
+        - docker build -t python .
+    tags:
+        - ec2
+        - server
+
+deploy:
+    stage: deploy_stage
+    script:
+        - docker run -d --name=pythoncontainer -p 80:8080 python
+        - docker login -u $DockerHub_username -p $Docker_token
+        - docker tag python $DockerHub_username/python
+        - docker push $DockerHub_username/python
+    tags:
+        - ec2
+        - server
